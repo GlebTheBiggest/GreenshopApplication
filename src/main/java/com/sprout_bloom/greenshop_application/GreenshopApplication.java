@@ -1,4 +1,4 @@
-package sprout.n.bloom.greenshop_application;
+package com.sprout_bloom.greenshop_application;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
