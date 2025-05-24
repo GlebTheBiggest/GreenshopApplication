@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | GreenShop</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f2fdf2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .login-container {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0, 128, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        h2 {
+            color: #2e7d32;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 1rem;
+            border: 1px solid #c8e6c9;
+            border-radius: 8px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #66bb6a;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        button:hover {
+            background-color: #4caf50;
+        }
+        .register-link {
+            margin-top: 1rem;
+            text-align: center;
+        }
+        .register-link a {
+            color: #388e3c;
+            text-decoration: none;
+        }
+        .error {
+            color: red;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <h2>Login to GreenShop</h2>
+
+    <div th:if="${param.error}" class="error">
+        Invalid username or password
+    </div>
+    <form th:action="@{/login}" method="post">
+        <input type="email" name="username" placeholder="Email" required />
+        <input type="password" name="password" placeholder="Password" required />
+        <button type="submit">Login</button>
+    </form>
+    <div class="register-link">
+        <p>I don’t have an account? <a th:href="@{/register}">Register now</a></p>
+    </div>
+</div>
+</body>
+</html>

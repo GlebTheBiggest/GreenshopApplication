@@ -22,9 +22,13 @@ public class User {
     @Email
     private String email;
 
+    @Column(unique = true, nullable = false)
+    @NotBlank
+    @Size(min = 5)
+    private String username;
+
     @Column(nullable = false)
     @NotBlank
-    @Size(min = 7)
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -35,10 +39,10 @@ public class User {
     )
     private Set<Role> roles;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 10)
     private String firstName;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 20)
     private String lastName;
 
     @Column(unique = true, nullable = false)
