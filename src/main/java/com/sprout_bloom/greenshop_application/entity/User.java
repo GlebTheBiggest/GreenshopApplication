@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+
 import java.util.Set;
 
 @Data
@@ -31,18 +32,17 @@ public class User {
     @NotBlank
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles;
+    // 🔹 Роль користувача (ТІЛЬКИ одна роль)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
 
     @Column(nullable = false, length = 10)
+    @NotBlank
     private String firstName;
 
     @Column(nullable = false, length = 20)
+    @NotBlank
     private String lastName;
 
     @Column(unique = true, nullable = false)
@@ -50,18 +50,20 @@ public class User {
     @Pattern(regexp = "\\+?\\d{10,15}")
     private String phone;
 
-    @NotBlank
     @Column(length = 254)
     private String address;
 
+    // 🔹 Статус облікового запису (активний чи ні)
     @Column(nullable = false)
     private boolean enabled = true;
 
+    // 🔹 Замовлення, прив'язані до користувача
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Order> orders;
 
+    // 🔹 Автоматично встановлює enabled = true при створенні нового запису
     @PrePersist
     protected void onCreate() {
-        enabled = true;
+        this.enabled = true;
     }
 }

@@ -36,7 +36,6 @@ public class UserRegistrationDto {
     @Pattern(regexp = "\\+?\\d{10,15}", message = "Invalid phone number format")
     private String phone;
 
-    @NotBlank(message = "Address is required")
     @Size(max = 254, message = "Address cannot be longer than 254 characters")
     private String address;
 }

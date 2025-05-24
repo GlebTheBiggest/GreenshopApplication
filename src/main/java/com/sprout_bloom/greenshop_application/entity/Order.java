@@ -38,6 +38,10 @@ public class Order {
     @JoinColumn(name = "order_status_id", nullable = false)
     private OrderStatus orderStatus;
 
+    @ManyToOne
+    @JoinColumn(name = "payment_status_id")
+    private PaymentStatus  paymentStatus;
+
     @PrePersist
     protected void onCreate() {
         date = LocalDateTime.now();

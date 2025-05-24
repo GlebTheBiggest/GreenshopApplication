@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Register | GreenShop</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
-            background: #f0fdf4;
+            background: #f2fdf2;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            position: relative;
         }
+
         .register-container {
             background: #ffffff;
             padding: 2rem;
@@ -19,25 +22,31 @@
             box-shadow: 0 4px 16px rgba(0, 128, 0, 0.1);
             width: 100%;
             max-width: 450px;
+            z-index: 1;
+            transition: opacity 0.4s ease;
         }
+
         h2 {
             color: #2e7d32;
             margin-bottom: 1.5rem;
             text-align: center;
         }
+
         input[type="text"],
         input[type="email"],
-        input[type="password"] {
+        input[type="password"],
+        input[type="tel"] {
             width: 100%;
             padding: 12px;
             margin-bottom: 1rem;
             border: 1px solid #c8e6c9;
             border-radius: 8px;
         }
+
         button {
             width: 100%;
             padding: 12px;
-            background-color: #81c784;
+            background-color: #66bb6a;
             border: none;
             border-radius: 8px;
             color: white;
@@ -45,31 +54,126 @@
             cursor: pointer;
             transition: background 0.3s ease;
         }
+
         button:hover {
             background-color: #4caf50;
         }
+
         .login-link {
             margin-top: 1rem;
             text-align: center;
         }
+
         .login-link a {
             color: #388e3c;
             text-decoration: none;
         }
+
+        .error {
+            color: red;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .dimmed {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .success-toast {
+            position: absolute;
+            top: 20px;
+            background-color: #4caf50;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 4px 16px rgba(0, 128, 0, 0.2);
+            z-index: 999;
+            display: none;
+            animation: slideDown 0.4s ease forwards;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
-<div class="register-container">
+<div class="success-toast" id="successToast">
+    Registration successful! Redirecting...
+</div>
+
+<div class="register-container" id="registerForm">
     <h2>Create an Account</h2>
-    <form th:action="@{/register}" method="post" th:object="${user}">
-        <input type="text" th:field="*{username}" placeholder="Username" required />
-        <input type="email" th:field="*{email}" placeholder="Email" required />
-        <input type="password" th:field="*{password}" placeholder="Password" required />
+
+    <div th:if="${error}" class="error" th:text="${error}"></div>
+
+    <form th:action="@{/register}" method="post" th:object="${user}" onsubmit="return handleRegister(event)">
+        <label>
+            <input type="text" th:field="*{firstName}" placeholder="First Name" required />
+        </label>
+        <label>
+            <input type="text" th:field="*{lastName}" placeholder="Last Name" required />
+        </label>
+        <label>
+            <input type="email" th:field="*{email}" placeholder="Email" required />
+        </label>
+        <label>
+            <input type="text" th:field="*{username}" placeholder="Username" required />
+        </label>
+        <label>
+            <input type="password" th:field="*{password}" placeholder="Password" required />
+        </label>
+        <label>
+            <input type="tel" th:field="*{phone}" placeholder="Phone Number" required />
+        </label>
+        <label>
+            <input type="text" th:field="*{address}" placeholder="Address (optional)" />
+        </label>
         <button type="submit">Register</button>
     </form>
+
     <div class="login-link">
-        <p>Already have an account? <a th:href="@{/login}">Login here</a></p>
+        <p>Already have an account? <a th:href="@{/login}">Log in</a></p>
     </div>
 </div>
+
+<script>
+    function handleRegister(event) {
+        event.preventDefault(); // prevent default form submission
+
+        const form = event.target;
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: "POST",
+            body: formData,
+        }).then(response => {
+            if (response.redirected) {
+                showSuccessToast();
+                setTimeout(() => {
+                    window.location.href = response.url;
+                }, 2500); // delay redirect to login
+            } else {
+                // fallback in case not redirected (e.g., validation failed)
+                window.location.reload();
+            }
+        }).catch(error => {
+            console.error("Registration failed", error);
+            window.location.reload();
+        });
+
+        return false;
+    }
+
+    function showSuccessToast() {
+        document.getElementById("registerForm").classList.add("dimmed");
+        const toast = document.getElementById("successToast");
+        toast.style.display = "block";
+    }
+</script>
 </body>
 </html>

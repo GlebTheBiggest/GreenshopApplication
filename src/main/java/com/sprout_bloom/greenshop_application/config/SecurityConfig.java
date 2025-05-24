@@ -1,8 +1,6 @@
 package com.sprout_bloom.greenshop_application.config;
 
 import com.sprout_bloom.greenshop_application.security.CustomUserDetailsService;
-import com.sprout_bloom.greenshop_application.util.Hasher;
-import com.sprout_bloom.greenshop_application.util.PasswordValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +10,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -19,30 +18,21 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private CustomUserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-
-        provider.setPasswordEncoder(new org.springframework.security.crypto.password.PasswordEncoder() {
-            @Override
-            public String encode(CharSequence rawPassword) {
-                if (!PasswordValidator.isValid(rawPassword.toString())) {
-                    throw new IllegalArgumentException("Password does not meet security requirements.");
-                }
-                return Hasher.hashString(rawPassword.toString());
-            }
-
-            @Override
-            public boolean matches(CharSequence rawPassword, String encodedPassword) {
-                return Hasher.checkString(rawPassword.toString(), encodedPassword);
-            }
-        });
-
+        provider.setPasswordEncoder(passwordEncoder());
         provider.setUserDetailsService(userDetailsService);
         return provider;
     }
+
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
