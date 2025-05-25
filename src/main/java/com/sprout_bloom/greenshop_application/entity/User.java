@@ -10,8 +10,14 @@ import lombok.Data;
 import java.util.Set;
 
 @Data
+@Embeddable
 @Entity
-@Table(name = "users")
+@Table(name = "users",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = "email", name = "users_email_key"),
+                @UniqueConstraint(columnNames = "username", name = "users_username_key"),
+                @UniqueConstraint(columnNames = "phone", name = "users_phone_key")
+        })
 public class User {
 
     @Id
@@ -45,9 +51,8 @@ public class User {
     @NotBlank
     private String lastName;
 
-    @Column(unique = true, nullable = false)
-    @Size(min = 10, max = 15)
-    @Pattern(regexp = "\\+?\\d{10,15}")
+    @Column(nullable = false, unique = true)
+    @Pattern(regexp = "^\\+48\\s\\d{3}\\s\\d{3}\\s\\d{3}$", message = "Phone must be in format +48 XXX XXX XXX")
     private String phone;
 
     @Column(length = 254)

@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
         user.setRole(userRole);
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
-        user.setPhone(userDto.getPhone());
+        user.setPhone(userDto.getPhone().replaceAll("[\\s-]+", " "));
         user.setAddress(userDto.getAddress());
         user.setEnabled(true);
 
@@ -69,12 +69,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean isEmailEligibleForRegistration(String email) {
-        return !userRepository.existsByEmail(email) && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+        boolean isUnique = !userRepository.existsByEmail(email);
+        boolean isValid = email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+        log.debug("[UserService] Email check - Unique: {}, Valid: {}", isUnique, isValid);
+        return isUnique && isValid;
     }
 
     @Override
     public boolean isPhoneNumberEligibleForRegistration(String phoneNumber) {
-        return phoneNumber.matches("^(\\+48)?\\d{9}$");
+        // Нормалізація номера перед перевіркою
+        String normalizedPhone = phoneNumber.replaceAll("[\\s-]+", " ");
+        boolean isUnique = !userRepository.existsByPhone(normalizedPhone);
+        boolean isValid = normalizedPhone.matches("^\\+48 \\d{3} \\d{3} \\d{3}$");
+        return isUnique && isValid;
     }
 
     @Override

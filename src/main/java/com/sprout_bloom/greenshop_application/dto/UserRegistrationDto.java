@@ -32,8 +32,7 @@ public class UserRegistrationDto {
     private String lastName;
 
     @NotBlank(message = "Phone number is required")
-    @Size(min = 10, max = 15, message = "Phone number must be between 10 and 15 digits")
-    @Pattern(regexp = "\\+?\\d{10,15}", message = "Invalid phone number format")
+    @Pattern(regexp = "^\\+48\\s\\d{3}\\s\\d{3}\\s\\d{3}$", message = "Phone must be in format +48 XXX XXX XXX")
     private String phone;
 
     @Size(max = 254, message = "Address cannot be longer than 254 characters")

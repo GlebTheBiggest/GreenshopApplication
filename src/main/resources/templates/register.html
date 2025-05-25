@@ -1,179 +1,243 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Register | GreenShop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Реєстрація | GreenShop</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <style>
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #f2fdf2;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0faf0;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            position: relative;
+            min-height: 100vh;
+            margin: 0;
         }
 
         .register-container {
             background: #ffffff;
-            padding: 2rem;
+            padding: 2rem 3rem;
             border-radius: 16px;
-            box-shadow: 0 4px 16px rgba(0, 128, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(46, 125, 50, 0.15);
             width: 100%;
-            max-width: 450px;
-            z-index: 1;
-            transition: opacity 0.4s ease;
+            max-width: 500px;
+            margin: 20px;
+            transition: transform 0.3s ease;
         }
 
         h2 {
             color: #2e7d32;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.8rem;
             text-align: center;
+            font-size: 1.8rem;
         }
 
-        input[type="text"],
-        input[type="email"],
-        input[type="password"],
-        input[type="tel"] {
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        input {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 1rem;
-            border: 1px solid #c8e6c9;
+            padding: 12px 16px;
+            border: 2px solid #c8e6c9;
             border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: #66bb6a;
+            box-shadow: 0 0 8px rgba(102, 187, 106, 0.2);
+            outline: none;
+        }
+
+        .error-field {
+            border-color: #ff4444 !important;
+            background-color: #fff5f5;
+        }
+
+        .field-error {
+            color: #ff4444;
+            font-size: 0.85rem;
+            margin-top: 0.4rem;
+            display: block;
         }
 
         button {
             width: 100%;
-            padding: 12px;
-            background-color: #66bb6a;
+            padding: 14px;
+            background: linear-gradient(135deg, #66bb6a, #4caf50);
             border: none;
             border-radius: 8px;
             color: white;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s ease;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         button:hover {
-            background-color: #4caf50;
+            opacity: 0.9;
+            transform: translateY(-1px);
         }
 
         .login-link {
-            margin-top: 1rem;
             text-align: center;
+            margin-top: 1.8rem;
+            color: #666;
         }
 
         .login-link a {
             color: #388e3c;
             text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
         }
 
-        .error {
-            color: red;
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-            text-align: center;
+        .login-link a:hover {
+            color: #2e7d32;
         }
 
-        .dimmed {
-            opacity: 0.3;
-            pointer-events: none;
-        }
-
-        .success-toast {
-            position: absolute;
-            top: 20px;
-            background-color: #4caf50;
-            color: white;
-            padding: 1rem 1.5rem;
+        .toast {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 1rem 2rem;
             border-radius: 8px;
-            font-weight: bold;
-            box-shadow: 0 4px 16px rgba(0, 128, 0, 0.2);
-            z-index: 999;
+            font-weight: 600;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
             display: none;
-            animation: slideDown 0.4s ease forwards;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
         }
 
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .toast.error {
+            background: #ff4444;
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from { top: -50px; opacity: 0; }
+            to { top: 30px; opacity: 1; }
+        }
+
+        .password-info {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.5rem;
         }
     </style>
 </head>
 <body>
-<div class="success-toast" id="successToast">
-    Registration successful! Redirecting...
-</div>
 
-<div class="register-container" id="registerForm">
-    <h2>Create an Account</h2>
+<div th:if="${error}" class="toast error" id="errorToast" th:text="${error}"></div>
 
-    <div th:if="${error}" class="error" th:text="${error}"></div>
+<div class="register-container">
+    <h2>Створення облікового запису</h2>
 
-    <form th:action="@{/register}" method="post" th:object="${user}" onsubmit="return handleRegister(event)">
-        <label>
-            <input type="text" th:field="*{firstName}" placeholder="First Name" required />
-        </label>
-        <label>
-            <input type="text" th:field="*{lastName}" placeholder="Last Name" required />
-        </label>
-        <label>
-            <input type="email" th:field="*{email}" placeholder="Email" required />
-        </label>
-        <label>
-            <input type="text" th:field="*{username}" placeholder="Username" required />
-        </label>
-        <label>
-            <input type="password" th:field="*{password}" placeholder="Password" required />
-        </label>
-        <label>
-            <input type="tel" th:field="*{phone}" placeholder="Phone Number" required />
-        </label>
-        <label>
-            <input type="text" th:field="*{address}" placeholder="Address (optional)" />
-        </label>
-        <button type="submit">Register</button>
+    <form th:action="@{/register}" th:object="${user}" method="post" novalidate>
+        <div class="form-group">
+            <input type="text" th:field="*{firstName}"
+                   placeholder="Ім'я"
+                   th:classappend="${#fields.hasErrors('firstName')} ? 'error-field'"/>
+            <div th:if="${#fields.hasErrors('firstName')}" class="field-error"
+                 th:errors="*{firstName}"></div>
+        </div>
+
+        <div class="form-group">
+            <input type="text" th:field="*{lastName}"
+                   placeholder="Прізвище"
+                   th:classappend="${#fields.hasErrors('lastName')} ? 'error-field'"/>
+            <div th:if="${#fields.hasErrors('lastName')}" class="field-error"
+                 th:errors="*{lastName}"></div>
+        </div>
+
+        <div class="form-group">
+            <input type="email" th:field="*{email}"
+                   placeholder="Електронна пошта"
+                   th:classappend="${#fields.hasErrors('email')} ? 'error-field'"/>
+            <div th:if="${#fields.hasErrors('email')}" class="field-error"
+                 th:errors="*{email}"></div>
+        </div>
+
+        <div class="form-group">
+            <input type="text" th:field="*{username}"
+                   placeholder="Логін"
+                   th:classappend="${#fields.hasErrors('username')} ? 'error-field'"/>
+            <div th:if="${#fields.hasErrors('username')}" class="field-error"
+                 th:errors="*{username}"></div>
+        </div>
+
+        <div class="form-group">
+            <input type="password" th:field="*{password}"
+                   placeholder="Пароль"
+                   th:classappend="${#fields.hasErrors('password')} ? 'error-field'"/>
+            <div th:if="${#fields.hasErrors('password')}" class="field-error"
+                 th:errors="*{password}"></div>
+            <div class="password-info">
+                Пароль має містити: 8+ символів, велику літеру та цифру
+            </div>
+        </div>
+
+        <div class="form-group">
+            <input type="tel" th:field="*{phone}"
+                   id="phoneInput"
+                   placeholder="+48 123 456 789"
+                   th:attr="value=${user.phone != null} ? ${user.phone} : '+48 '"
+                   th:classappend="${#fields.hasErrors('phone')} ? 'error-field'"/>
+            <div th:if="${#fields.hasErrors('phone')}" class="field-error"
+                 th:errors="*{phone}"></div>
+        </div>
+
+        <div class="form-group">
+            <input type="text" th:field="*{address}"
+                   placeholder="Адреса (необов'язково)"/>
+        </div>
+
+        <button type="submit">Зареєструватися</button>
     </form>
 
     <div class="login-link">
-        <p>Already have an account? <a th:href="@{/login}">Log in</a></p>
+        <p>Вже маєте акаунт? <a th:href="@{/login}">Увійти</a></p>
     </div>
 </div>
 
 <script>
-    function handleRegister(event) {
-        event.preventDefault(); // prevent default form submission
+    document.addEventListener('DOMContentLoaded', () => {
+        const phoneInput = document.getElementById('phoneInput');
 
-        const form = event.target;
-        const formData = new FormData(form);
+        if (!phoneInput.value.startsWith('+48')) {
+            phoneInput.value = '+48 ';
+        }
 
-        fetch(form.action, {
-            method: "POST",
-            body: formData,
-        }).then(response => {
-            if (response.redirected) {
-                showSuccessToast();
-                setTimeout(() => {
-                    window.location.href = response.url;
-                }, 2500); // delay redirect to login
-            } else {
-                // fallback in case not redirected (e.g., validation failed)
-                window.location.reload();
-            }
-        }).catch(error => {
-            console.error("Registration failed", error);
-            window.location.reload();
+        const formatPhoneNumber = (value) => {
+            const numbers = value.replace(/\D/g, '').slice(2);
+            let formatted = '+48';
+
+            if (numbers.length > 0) formatted += ' ' + numbers.slice(0, 3);
+            if (numbers.length > 3) formatted += ' ' + numbers.slice(3, 6);
+            if (numbers.length > 6) formatted += ' ' + numbers.slice(6, 9);
+
+            return formatted;
+        };
+
+        phoneInput.addEventListener('input', (e) => {
+            e.target.value = formatPhoneNumber(e.target.value);
         });
 
-        return false;
-    }
-
-    function showSuccessToast() {
-        document.getElementById("registerForm").classList.add("dimmed");
-        const toast = document.getElementById("successToast");
-        toast.style.display = "block";
-    }
+        const errorToast = document.getElementById('errorToast');
+        if (errorToast) {
+            errorToast.style.display = 'block';
+            setTimeout(() => errorToast.remove(), 5000);
+        }
+    });
 </script>
+
 </body>
 </html>

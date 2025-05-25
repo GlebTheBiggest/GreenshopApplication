@@ -17,38 +17,19 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
-        log.info("Attempting to load user by identifier: {}", identifier);
+    public UserDetails loadUserByUsername(String identifier)
+            throws UsernameNotFoundException {
 
-        User user = userRepository.findByEmail(identifier)
-                .orElseGet(() -> userRepository.findByUsername(identifier)
-                        .orElseThrow(() -> {
-                            log.warn("User not found with identifier: {}", identifier);
-                            return new UsernameNotFoundException("User not found with identifier: " + identifier);
-                        }));
+        log.info("⏳ Attempting to load user by identifier: {}", identifier);
 
-        if (!user.isEnabled()) {
-            throw new UsernameNotFoundException("User account is disabled: " + identifier);
-        }
-
-        log.info("User {} loaded successfully", user.getEmail());
-        return new CustomUserDetails(user);
-    }
-
-    public UserDetails loadUserById(Long id) throws UsernameNotFoundException {
-        log.info("Attempting to load user by ID: {}", id);
-
-        User user = userRepository.findById(id)
+        User user = userRepository.findByEmailOrUsername(identifier)
                 .orElseThrow(() -> {
-                    log.warn("User not found with ID: {}", id);
-                    return new UsernameNotFoundException("User not found with ID: " + id);
+                    log.warn("🚨 User not found with identifier: {}", identifier);
+                    return new UsernameNotFoundException("Користувача не знайдено: " + identifier);
                 });
 
-        if (!user.isEnabled()) {
-            throw new UsernameNotFoundException("User account is disabled: " + id);
-        }
+        log.info("✅ User loaded successfully: {} (ID: {})", user.getUsername(), user.getId());
 
-        log.info("User {} loaded successfully", user.getEmail());
         return new CustomUserDetails(user);
     }
 }
