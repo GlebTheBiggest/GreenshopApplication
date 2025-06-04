@@ -1,0 +1,17 @@
+{% extends "fragments/base.html" %}
+
+{% block title %}Замовлення прийнято{% endblock %}
+
+{% block content %}
+<div class="confirmation">
+    <h1>Дякуємо за замовлення!</h1>
+    <p>Ваше замовлення <strong>№{{ order.id }}</strong> успішно оформлене</p>
+    <p>Очікуйте дзвінка від менеджера для підтвердження</p>
+    <div class="order-summary">
+        <h3>Деталі замовлення:</h3>
+        <p>Сума: {{ order.total }} грн</p>
+        <p>Адреса доставки: {{ order.shipping_address }}</p>
+    </div>
+    <a href="{{ url_for('main.index') }}" class="btn">На головну</a>
+</div>
+{% endblock %}

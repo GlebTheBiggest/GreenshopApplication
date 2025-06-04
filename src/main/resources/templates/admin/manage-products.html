@@ -1,0 +1,39 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Управління товарами{% endblock %}
+
+{% block admin_content %}
+<h1>Управління товарами</h1>
+
+<table class="admin-table">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Назва</th>
+        <th>Ціна</th>
+        <th>Категорія</th>
+        <th>Статус</th>
+        <th>Дії</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for product in products %}
+    <tr>
+        <td>{{ product.id }}</td>
+        <td>{{ product.name }}</td>
+        <td>{{ product.price }}</td>
+        <td>{{ product.category.name }}</td>
+        <td>{{ 'Активний' if product.active else 'Неактивний' }}</td>
+        <td>
+            <a href="{{ url_for('admin.edit_product', product_id=product.id) }}" class="btn">Редагувати</a>
+            <form action="{{ url_for('admin.delete_product', product_id=product.id) }}" method="POST">
+                <button type="submit" class="btn danger">Видалити</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<a href="{{ url_for('admin.add_product') }}" class="btn">Додати товар</a>
+{% endblock %}

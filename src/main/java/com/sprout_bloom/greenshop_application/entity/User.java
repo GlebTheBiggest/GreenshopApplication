@@ -1,16 +1,22 @@
 package com.sprout_bloom.greenshop_application.entity;
 
+import com.sprout_bloom.greenshop_application.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 
 import java.util.Set;
 
 @Data
-@Embeddable
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "users",
         uniqueConstraints = {
@@ -25,30 +31,30 @@ public class User {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    @NotBlank
-    @Email
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
     private String email;
 
     @Column(unique = true, nullable = false)
-    @NotBlank
-    @Size(min = 5)
+    @NotBlank(message = "Username is required")
+    @Size(min = 5, message = "Username must be at least 5 characters")
     private String username;
 
     @Column(nullable = false)
-    @NotBlank
+    @NotBlank(message = "Password is required")
     private String password;
 
-    // 🔹 Роль користувача (ТІЛЬКИ одна роль)
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id", nullable = false)
+    // 🔹 Роль користувача (одна роль)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Role role;
 
     @Column(nullable = false, length = 10)
-    @NotBlank
+    @NotBlank(message = "First name is required")
     private String firstName;
 
     @Column(nullable = false, length = 20)
-    @NotBlank
+    @NotBlank(message = "Last name is required")
     private String lastName;
 
     @Column(nullable = false, unique = true)

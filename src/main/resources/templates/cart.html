@@ -1,0 +1,51 @@
+{% extends "fragments/base.html" %}
+
+{% block title %}Кошик{% endblock %}
+
+{% block content %}
+<h1>Ваш кошик</h1>
+
+{% if cart_items %}
+<table class="cart-table">
+    <thead>
+    <tr>
+        <th>Товар</th>
+        <th>Ціна</th>
+        <th>Кількість</th>
+        <th>Сума</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for item in cart_items %}
+    <tr>
+        <td>{{ item.product.name }}</td>
+        <td>{{ item.product.price }} грн</td>
+        <td>
+            <input type="number" min="1" value="{{ item.quantity }}"
+                   data-id="{{ item.product.id }}" class="update-quantity">
+        </td>
+        <td>{{ item.total }} грн</td>
+        <td>
+            <button class="remove-from-cart" data-id="{{ item.product.id }}">Видалити</button>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+    <tfoot>
+    <tr>
+        <td colspan="3">Загальна сума:</td>
+        <td colspan="2">{{ total_amount }} грн</td>
+    </tr>
+    </tfoot>
+</table>
+
+<div class="cart-actions">
+    <a href="{{ url_for('products.products_list') }}" class="btn">Продовжити покупки</a>
+    <a href="{{ url_for('orders.checkout') }}" class="btn primary">Оформити замовлення</a>
+</div>
+{% else %}
+<p>Ваш кошик порожній</p>
+<a href="{{ url_for('products.products_list') }}" class="btn">Перейти до товарів</a>
+{% endif %}
+{% endblock %}

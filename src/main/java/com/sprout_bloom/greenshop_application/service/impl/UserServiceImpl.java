@@ -1,10 +1,8 @@
 package com.sprout_bloom.greenshop_application.service.impl;
 
 import com.sprout_bloom.greenshop_application.dto.UserRegistrationDto;
-import com.sprout_bloom.greenshop_application.entity.Role;
 import com.sprout_bloom.greenshop_application.entity.User;
 import com.sprout_bloom.greenshop_application.exception.InvalidRegistrationException;
-import com.sprout_bloom.greenshop_application.repository.RoleRepository;
 import com.sprout_bloom.greenshop_application.repository.UserRepository;
 import com.sprout_bloom.greenshop_application.service.UserService;
 import com.sprout_bloom.greenshop_application.util.PasswordValidator;
@@ -14,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.sprout_bloom.greenshop_application.enums.RoleType.USER;
+import static com.sprout_bloom.greenshop_application.enums.Role.USER;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +21,6 @@ import static com.sprout_bloom.greenshop_application.enums.RoleType.USER;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
@@ -52,9 +49,7 @@ public class UserServiceImpl implements UserService {
         user.setUsername(userDto.getUsername());
         user.setEmail(userDto.getEmail());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        Role userRole = roleRepository.findByType(USER)
-                .orElseThrow(() -> new RuntimeException("USER role not found in database"));
-        user.setRole(userRole);
+        user.setRole(USER);
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
         user.setPhone(userDto.getPhone().replaceAll("[\\s-]+", " "));

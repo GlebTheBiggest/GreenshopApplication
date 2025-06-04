@@ -1,13 +1,709 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="uk">
 <head>
+    <!-- Загальні налаштування сторінки -->
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Greenshop</title></head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenShop | Екологічні товари</title>
+
+    <!-- Підключення CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Глобальні стилі та скидання браузерних налаштувань */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f8fbf8;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* СТИЛІ ДЛЯ ХЕДЕРА */
+        header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100; /* Забезпечує перекриття іншого контенту */
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Стилі для логотипу */
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo img {
+            height: 40px;
+        }
+
+        .logo h1 {
+            color: #2e7d32;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        /* Навігаційне меню */
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #4a4a4a;
+            font-weight: 500;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        /* Ефекти при наведенні на пункти меню */
+        nav a:hover {
+            color: #2e7d32;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #2e7d32;
+            transition: width 0.3s;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* Кнопки дій в хедері (кошик, користувач) */
+        .header-actions {
+            display: flex;
+            gap: 1.2rem;
+        }
+
+        .action-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            font-size: 1.2rem;
+            color: #4a4a4a;
+            transition: color 0.3s;
+        }
+
+        .action-btn:hover {
+            color: #2e7d32;
+        }
+
+        /* Бейдж з кількістю товарів у кошику */
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -8px;
+            background: #ff4444;
+            color: white;
+            font-size: 0.7rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Випадаюче меню користувача */
+        .user-menu {
+            position: relative;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            width: 200px;
+            display: none;
+            z-index: 10;
+        }
+
+        .user-menu:hover .user-dropdown {
+            display: block;
+        }
+
+        .user-dropdown a {
+            display: block;
+            padding: 0.5rem 0;
+            color: #4a4a4a;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .user-dropdown a:hover {
+            color: #2e7d32;
+        }
+
+        .divider {
+            height: 1px;
+            background: #eee;
+            margin: 0.5rem 0;
+        }
+
+        /* ОСНОВНИЙ КОНТЕНТ */
+        main {
+            flex: 1;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            width: 100%;
+        }
+
+        /* Герой-секція з баннером */
+        .hero {
+            background: linear-gradient(rgba(46, 125, 50, 0.9), rgba(46, 125, 50, 0.8)),
+            url('https://images.unsplash.com/photo-1464226184884-fa280b87c399?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            border-radius: 16px;
+            padding: 4rem 2rem;
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+
+        .hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        /* Стилі для кнопок */
+        .btn {
+            background: white;
+            color: #2e7d32;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: #f0f7f0;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Заголовки секцій */
+        .section-title {
+            text-align: center;
+            margin: 3rem 0 2rem;
+            color: #2e7d32;
+            font-size: 2rem;
+        }
+
+        /* Сітка товарів */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        /* Картка товару */
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-image {
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+
+        /* Інформація про товар */
+        .product-info {
+            padding: 1.5rem;
+        }
+
+        .product-title {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .product-price {
+            font-weight: 700;
+            color: #2e7d32;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Кнопки дій для товару */
+        .product-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .add-to-cart {
+            flex: 1;
+            background: #66bb6a;
+            color: white;
+            border: none;
+            padding: 0.7rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .add-to-cart:hover {
+            background: #4caf50;
+        }
+
+        .wishlist {
+            width: 40px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .wishlist:hover {
+            background: #e0e0e0;
+        }
+
+        /* СТИЛІ ДЛЯ ФУТЕРА */
+        footer {
+            background: #2e7d32;
+            color: white;
+            padding: 3rem 0 1rem;
+            margin-top: auto; /* Прижимає футер до низу */
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Посилання у футері */
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        /* Соціальні мережі */
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            font-size: 1.2rem;
+            transition: background 0.3s;
+        }
+
+        .social-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Кнопка "Нагору" */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+            z-index: 99;
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+        }
+
+        .back-to-top:hover {
+            background: #1b5e20;
+            transform: translateY(-3px);
+        }
+
+        /* Копірайт */
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        /* АДАПТИВНІСТЬ */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav ul {
+                gap: 1rem;
+            }
+
+            .hero {
+                padding: 2rem 1rem;
+            }
+
+            .hero h2 {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .hero h2 {
+                font-size: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
-<h1>Ласкаво просимо в Greenshop!</h1>
+<!-- ХЕДЕР -->
+<header>
+    <div class="header-container">
+        <!-- Логотип -->
+        <div class="logo">
+            <i class="fas fa-leaf" style="color: #2e7d32; font-size: 1.8rem;"></i>
+            <h1>GreenShop</h1>
+        </div>
+
+        <!-- Головна навігація -->
+        <nav>
+            <ul>
+                <li><a href="#" class="active">Головна</a></li>
+                <li><a href="#">Каталог</a></li>
+                <li><a href="#">Про нас</a></li>
+                <li><a href="#">Контакти</a></li>
+            </ul>
+        </nav>
+
+        <!-- Дії користувача -->
+        <div class="header-actions">
+            <div class="user-menu">
+                <button class="action-btn">
+                    <i class="fas fa-user"></i>
+                </button>
+                <!-- Випадаюче меню користувача -->
+                <div class="user-dropdown">
+                    <a href="#"><i class="fas fa-user-circle"></i> Мій профіль</a>
+                    <a href="#"><i class="fas fa-shopping-bag"></i> Мої замовлення</a>
+                    <a href="#"><i class="fas fa-cog"></i> Налаштування</a>
+                    <div class="divider"></div>
+                    <a href="#"><i class="fas fa-sign-out-alt"></i> Вийти</a>
+                </div>
+            </div>
+
+            <!-- Кошик з кількістю товарів -->
+            <button class="action-btn">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count">3</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- ОСНОВНИЙ КОНТЕНТ -->
+<main>
+    <!-- Герой-секція -->
+    <section class="hero">
+        <h2>Екологічні товари для вашого дому</h2>
+        <p>Відкрийте для себе натуральні продукти, що піклуються про ваше здоров'я та навколишнє середовище</p>
+        <a href="#" class="btn">Перейти до каталогу</a>
+    </section>
+
+    <!-- Секція популярних товарів -->
+    <h2 class="section-title">Популярні товари</h2>
+
+    <!-- Сітка товарів -->
+    <div class="products-grid">
+        <!-- Картка товару 1 -->
+        <div class="product-card">
+            <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1595341888016-a392ef81b7de?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                     alt="Органічний мед">
+            </div>
+            <div class="product-info">
+                <h3 class="product-title">Органічний мед</h3>
+                <div class="product-price">149 ₴</div>
+                <div class="product-actions">
+                    <button class="add-to-cart">Додати у кошик</button>
+                    <button class="wishlist"><i class="far fa-heart"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Картка товару 2 -->
+        <div class="product-card">
+            <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                     alt="Бамбукова щітка">
+            </div>
+            <div class="product-info">
+                <h3 class="product-title">Бамбукова щітка</h3>
+                <div class="product-price">89 ₴</div>
+                <div class="product-actions">
+                    <button class="add-to-cart">Додати у кошик</button>
+                    <button class="wishlist"><i class="far fa-heart"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Картка товару 3 -->
+        <div class="product-card">
+            <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1594032194509-0056023973b2?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                     alt="Еко сумка">
+            </div>
+            <div class="product-info">
+                <h3 class="product-title">Еко сумка</h3>
+                <div class="product-price">199 ₴</div>
+                <div class="product-actions">
+                    <button class="add-to-cart">Додати у кошик</button>
+                    <button class="wishlist"><i class="far fa-heart"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Картка товару 4 -->
+        <div class="product-card">
+            <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1594035910387-fea47794261f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                     alt="Натуральне мило">
+            </div>
+            <div class="product-info">
+                <h3 class="product-title">Натуральне мило</h3>
+                <div class="product-price">65 ₴</div>
+                <div class="product-actions">
+                    <button class="add-to-cart">Додати у кошик</button>
+                    <button class="wishlist"><i class="far fa-heart"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- ФУТЕР -->
+<footer>
+    <div class="footer-container">
+        <!-- Інформаційна секція футера -->
+        <div class="footer-section">
+            <h3>GreenShop</h3>
+            <p style="color: rgba(255,255,255,0.8); margin-bottom: 1rem;">
+                Ми пропонуємо екологічно чисті товари для вашого здорового способу життя.
+            </p>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+
+        <!-- Категорії товарів -->
+        <div class="footer-section">
+            <h3>Каталог</h3>
+            <ul class="footer-links">
+                <li><a href="#">Продукти харчування</a></li>
+                <li><a href="#">Косметика</a></li>
+                <li><a href="#">Побутова хімія</a></li>
+                <li><a href="#">Текстиль</a></li>
+                <li><a href="#">Для дому</a></li>
+            </ul>
+        </div>
+
+        <!-- Корисні посилання -->
+        <div class="footer-section">
+            <h3>Корисне</h3>
+            <ul class="footer-links">
+                <li><a href="#">Доставка та оплата</a></li>
+                <li><a href="#">Повернення товару</a></li>
+                <li><a href="#">Блог</a></li>
+                <li><a href="#">Еко-поради</a></li>
+                <li><a href="#">Програма лояльності</a></li>
+            </ul>
+        </div>
+
+        <!-- Контактна інформація -->
+        <div class="footer-section">
+            <h3>Контакти</h3>
+            <ul class="footer-links">
+                <li><i class="fas fa-map-marker-alt"></i> м. Київ, вул. Екологічна 15</li>
+                <li><i class="fas fa-phone"></i> +38 (044) 123-45-67</li>
+                <li><i class="fas fa-envelope"></i> info@greenshop.com</li>
+                <li><i class="fas fa-clock"></i> Пн-Нд: 9:00 - 20:00</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Копірайт -->
+    <div class="copyright">
+        &copy; 2023 GreenShop. Всі права захищені.
+    </div>
+</footer>
+
+<!-- Кнопка "Нагору" -->
+<button class="back-to-top" id="backToTop">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<script>
+    // Скрипт для кнопки "Нагору"
+    const backToTopBtn = document.getElementById('backToTop');
+
+    // Прослуховування події скролу
+    window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 300) {
+            backToTopBtn.classList.add('show');
+        } else {
+            backToTopBtn.classList.remove('show');
+        }
+    });
+
+    // Обробник кліку для плавного скролу нагору
+    backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+
+    // Підсвітка активного пункту меню
+    const navLinks = document.querySelectorAll('nav a');
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+            // Знімаємо активний клас з усіх пунктів
+            navLinks.forEach(item => item.classList.remove('active'));
+            // Додаємо активний клас до поточного пункту
+            this.classList.add('active');
+        });
+    });
+</script>
 </body>
 </html>
