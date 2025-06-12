@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Вхід | GreenShop</title>
+    <link rel="stylesheet" href="/login/css/login.css">
+</head>
+<body>
+<!-- Тоасти -->
+<div class="toast success" id="successToast" style="display: none;" role="alert" aria-live="assertive">
+    ✅ Реєстрація успішна! Тепер увійдіть у систему.
+</div>
+<div class="toast error" id="errorToast" style="display: none;" role="alert" aria-live="assertive">
+    Невірний логін або пароль
+</div>
+
+<div class="login-container">
+    <h2>Вхід в GreenShop</h2>
+
+    <form action="/login" method="post">
+        <label for="username">Електронна пошта або логін</label>
+        <input type="text" id="username" name="username" placeholder="Електронна пошта або логін" required>
+
+        <label for="password">Пароль</label>
+        <input type="password" id="password" name="password" placeholder="Пароль" required>
+
+        <button type="submit">Увійти</button>
+    </form>
+
+    <div class="register-link">
+        <p>Не маєте акаунта? <a href="/register">Зареєструватися</a></p>
+    </div>
+</div>
+
+<script src="/login/js/login.js"></script>
+</body>
+</html>

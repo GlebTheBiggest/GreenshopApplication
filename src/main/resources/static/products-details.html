@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenShop | Деталі товару</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<!-- Header -->
+<header>
+    <div class="header-container">
+        <h1><a href="/static" style="text-decoration: none; color: inherit;">GreenShop</a></h1>
+    </div>
+</header>
+
+<!-- Main content -->
+<main class="product-details-container">
+    <div class="breadcrumbs">
+        <a href="/static">Головна</a> /
+        <a href="/profile">Каталог</a> /
+        <a href="/category/organic">Органічні продукти</a> /
+        <span>Органічний мед</span>
+    </div>
+
+    <div class="product-details">
+        <div class="product-gallery">
+            <div class="main-image">
+                <img src="https://images.unsplash.com/photo-1595341888016-a392ef81b7de?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                     alt="Органічний мед" class="active">
+            </div>
+            <div class="thumbnails">
+                <img src="https://images.unsplash.com/photo-1551269901-5c5e14c25df7?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
+                     alt="Мед 1">
+                <img src="https://images.unsplash.com/photo-1587049352851-8d4e89133924?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
+                     alt="Мед 2">
+                <img src="https://images.unsplash.com/photo-1587049352851-8d4e89133924?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
+                     alt="Мед 3">
+            </div>
+        </div>
+
+        <div class="product-info">
+            <h1>Органічний мед з лісових квітів</h1>
+
+            <div class="product-meta">
+                <span class="product-code">Код: GS-12345</span>
+                <div class="product-rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                    <span>(42 відгуки)</span>
+                </div>
+            </div>
+
+            <div class="product-price">
+                <span class="current-price">149 ₴</span>
+                <span class="old-price">179 ₴</span>
+                <span class="discount">-17%</span>
+            </div>
+
+            <div class="product-description">
+                <p>Натуральний органічний мед, зібраний у екологічно чистих районах Карпат. Не містить добавок, консервантів та ГМО.</p>
+                <ul class="features-list">
+                    <li><i class="fas fa-check"></i> 100% натуральний склад</li>
+                    <li><i class="fas fa-check"></i> Без консервантів та барвників</li>
+                    <li><i class="fas fa-check"></i> Вироблено в Україні</li>
+                    <li><i class="fas fa-check"></i> Термін придатності: 24 місяці</li>
+                </ul>
+            </div>
+
+            <div class="product-actions">
+                <div class="quantity-selector">
+                    <button class="quantity-btn minus"><i class="fas fa-minus"></i></button>
+                    <input type="number" value="1" min="1" max="10">
+                    <button class="quantity-btn plus"><i class="fas fa-plus"></i></button>
+                </div>
+
+                <button class="add-to-cart">
+                    <i class="fas fa-shopping-cart"></i> Додати у кошик
+                </button>
+
+                <button class="wishlist">
+                    <i class="far fa-heart"></i>
+                </button>
+            </div>
+
+            <div class="product-delivery">
+                <div class="delivery-option">
+                    <i class="fas fa-truck"></i>
+                    <span>Доставка по всій Україні - 1-3 дні</span>
+                </div>
+                <div class="delivery-option">
+                    <i class="fas fa-store"></i>
+                    <span>Самовивіз з нашого магазину в Києві</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="product-tabs">
+        <div class="tabs-header">
+            <button class="tab-btn active" data-tab="description">Опис</button>
+            <button class="tab-btn" data-tab="specs">Характеристики</button>
+            <button class="tab-btn" data-tab="reviews">Відгуки (42)</button>
+        </div>
+
+        <div class="tabs-content">
+            <div class="tab-pane active" id="description">
+                <h3>Детальний опис товару</h3>
+                <p>Цей мед зібраний бджолами з лісових квітів у Карпатах. Він має багатий аромат та неповторний смак.</p>
+                <ul>
+                    <li>Підвищення імунітету</li>
+                    <li>Лікування простудних захворювань</li>
+                    <li>Випічки та приготування десертів</li>
+                    <li>Додавання в чай замість цукру</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Footer -->
+<footer>
+    <p>© 2023 GreenShop. Всі права захищені.</p>
+</footer>
+
+<button class="back-to-top" id="backToTop">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<script src="/js/script.js"></script>
+</body>
+</html>

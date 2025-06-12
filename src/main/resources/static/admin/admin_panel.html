@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenShop | Адмін-панель</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/admin/css/admin.css">
+    <link rel="stylesheet" href="/admin/css/toast.css">
+</head>
+<body>
+<div id="toastContainer"></div>
+<div id="flashSuccess" style="display:none"></div>
+<div id="flashError" style="display:none"></div>
+
+<header>
+    <div class="header-container">
+        <h1>GreenShop | Адмін-панель</h1>
+    </div>
+</header>
+
+<div class="admin-container">
+    <aside class="admin-sidebar">
+        <nav>
+            <ul>
+                <li><a href="/admin/panel">Панель керування</a></li>
+                <li><a href="/admin/products">Товари</a></li>
+                <li><a href="/admin/orders">Замовлення</a></li>
+                <li><a href="/admin/customers">Клієнти</a></li>
+                <li><a href="/admin/reports">Звіти</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="admin-content">
+        <section id="dashboard">
+            <h2>Тут буде контент активного розділу</h2>
+        </section>
+    </main>
+</div>
+
+<footer>
+    <p>© 2023 GreenShop. Адміністративна панель.</p>
+</footer>
+
+<script src="/admin/js/toast.js"></script>
+<script src="/admin/js/modal.js"></script>
+<script src="/admin/js/images.js"></script>
+<script src="/admin/js/admin.js"></script>
+</body>
+</html>

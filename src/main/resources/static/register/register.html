@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Реєстрація | GreenShop</title>
+    <link rel="stylesheet" href="/register/css/register.css">
+</head>
+<body>
+<div class="toast error" id="errorToast" style="display: none;">Помилка реєстрації: перевірте дані</div>
+
+<div class="register-container">
+    <h2>Створення облікового запису</h2>
+
+    <form action="/register" method="post" novalidate>
+        <div class="form-group">
+            <input type="text" name="firstName" placeholder="Ім'я" required>
+        </div>
+
+        <div class="form-group">
+            <input type="text" name="lastName" placeholder="Прізвище" required>
+        </div>
+
+        <div class="form-group">
+            <input type="email" name="email" placeholder="Електронна пошта" required>
+        </div>
+
+        <div class="form-group">
+            <input type="text" name="username" placeholder="Логін" required>
+        </div>
+
+        <div class="form-group">
+            <input type="password" name="password" placeholder="Пароль" required>
+            <div class="password-info">Пароль має містити: 8+ символів, велику літеру та цифру</div>
+        </div>
+
+        <div class="form-group">
+            <input type="password" name="confirmPassword" placeholder="Підтвердіть пароль" required>
+        </div>
+
+        <div class="form-group">
+            <input type="tel" id="phoneInput" name="phone" placeholder="+48 123 456 789">
+        </div>
+
+        <div class="form-group">
+            <input type="text" name="address" placeholder="Адреса (необов'язково)" maxlength="254">
+        </div>
+
+        <button type="submit">Зареєструватися</button>
+    </form>
+
+    <div class="login-link">
+        <p>Вже маєте акаунт? <a href="/login">Увійти</a></p>
+    </div>
+</div>
+
+<script src="/register/js/register.js"></script>
+</body>
+</html>

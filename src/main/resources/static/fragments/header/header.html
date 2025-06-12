@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <link rel="stylesheet" href="/fragments/header/css/header.css">
+    <meta charset="UTF-8">
+    <title>GreenShop - Заголовок</title>
+</head>
+<body>
+<header>
+    <div class="header-container">
+        <div class="logo">
+            <i class="fas fa-leaf" style="color: #2e7d32; font-size: 1.8rem;"></i>
+            <h1>
+                <a href="/static" style="text-decoration: none; color: inherit;">GreenShop</a>
+            </h1>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="/static">Головна</a></li>
+                <li><a href="/profile">Каталог</a></li>
+                <li><a href="/about">Про нас</a></li>
+                <li><a href="/contact">Контакти</a></li>
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            <div class="user-menu">
+                <button class="action-btn">
+                    <i class="fas fa-user"></i>
+                </button>
+                <div class="user-dropdown" id="userDropdown">
+                    <!-- Пункти меню будуть додані через JavaScript -->
+                </div>
+            </div>
+
+            <a class="action-btn" href="/cart">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count">0</span>
+            </a>
+        </div>
+    </div>
+</header>
+<script src="/fragments/header/js/header.js"></script>
+</body>
+</html>
