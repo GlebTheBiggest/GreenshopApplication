@@ -1,0 +1,11 @@
+services:
+  postgres-db:
+    image: postgres:15
+    container_name: greenshop_db
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: greenshop_db
+    ports:
+      - "5433:5432"
+    restart: always
