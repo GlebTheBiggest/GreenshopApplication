@@ -103,8 +103,8 @@ automatically):
 docker compose up -d
 ```
 
-This starts Postgres on host port `5433` (mapped to the container's `5432`), which is
-why the `DB_URL` example above uses `5433` instead of the Postgres default. Data is not
+The container is configured (via `PGPORT`) to listen on `5433` instead of the Postgres
+default `5432`, which is why the `DB_URL` example above uses `5433`. Data is not
 persisted across `docker compose down -v`.
 
 ### Run
