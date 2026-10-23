@@ -22,24 +22,11 @@
 		<java.version>21</java.version>
 		<lombok.version>1.18.32</lombok.version>
 		<junit.jupiter.version>5.10.0</junit.jupiter.version>
-		<hibernate.version>6.4.4.Final</hibernate.version>
 		<springdoc.version>2.1.0</springdoc.version>
 		<modelmapper-spring.version>2.4.4</modelmapper-spring.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-bom</artifactId>
-				<version>6.2.5</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 
 	<dependencies>
 		<!-- Spring Boot Starters -->
