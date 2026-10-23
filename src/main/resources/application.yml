@@ -1,0 +1,49 @@
+# Optional initial admin credentials (currently unused):
+# spring.security.user.name=${ADMIN_USERNAME}
+# spring.security.user.password=${ADMIN_PASSWORD}
+
+spring:
+  application:
+    name: ${SPRING_APPLICATION_NAME}
+
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: ${DB_DRIVER}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        connection:
+          autocommit: false
+
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+server:
+  port: ${SERVER_PORT}
+
+application:
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET_KEY}
+      expiration: ${JWT_EXPIRATION}
+      refresh-token:
+        expiration: ${JWT_REFRESH_EXPIRATION}
+
+stripe:
+  api:
+    key: ${STRIPE_API_KEY}
+  public:
+    key: ${STRIPE_PUBLIC_KEY}
+
+api:
+  prefix: ${API_PREFIX}
