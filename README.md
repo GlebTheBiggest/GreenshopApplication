@@ -58,6 +58,56 @@ src/main/java/.../
 └── exceptions/  Custom exceptions
 ```
 
+## Running locally
+
+### Prerequisites
+
+- JDK 21
+- A PostgreSQL database (local instance or a managed one, e.g. Neon/RDS/etc.)
+- A Stripe account (test mode is fine) if you want payment creation to actually work;
+  any placeholder value lets the app start, but payment calls will fail
+
+### Environment variables
+
+Configuration is driven entirely by environment variables (see
+`src/main/resources/application.properties`). The project uses
+[`spring-dotenv`](https://github.com/paulschwarz/spring-dotenv), which loads a `.env`
+file **from the project root** (`./.env`) if present — not from `src/`. Create one there,
+or export the variables another way (shell, IDE run config, Docker env file, etc.):
+
+| Variable | Example | Notes |
+|---|---|---|
+| `SPRING_APPLICATION_NAME` | `GreenshopApplication` | |
+| `SERVER_PORT` | `8080` | |
+| `API_PREFIX` | `/api/v1` | |
+| `JWT_SECRET_KEY` | *(random Base64 string)* | HMAC signing key, keep secret |
+| `JWT_EXPIRATION` | `3600000` | Access token TTL, ms |
+| `JWT_REFRESH_EXPIRATION` | `604800000` | Refresh token TTL, ms |
+| `STRIPE_API_KEY` | `sk_test_...` | Stripe secret key |
+| `STRIPE_PUBLIC_KEY` | `pk_test_...` | Stripe publishable key |
+| `DB_URL` | `jdbc:postgresql://localhost:5432/greenshop_db` | |
+| `DB_USERNAME` | `greenshop` | |
+| `DB_PASSWORD` | *(your password)* | |
+| `DB_DRIVER` | `org.postgresql.Driver` | |
+
+Never commit a real `.env` file — it's already covered by `.gitignore`.
+
+### Run
+
+```bash
+./mvnw spring-boot:run
+```
+
+The app starts on `http://localhost:${SERVER_PORT}`. On first run, Hibernate creates the
+schema automatically (`spring.jpa.hibernate.ddl-auto=update`).
+
+### Explore the API
+
+Once running, open:
+
+- Swagger UI: `http://localhost:8080/swagger-ui/index.html`
+- Raw OpenAPI spec: `http://localhost:8080/v3/api-docs`
+
 ## Known limitations
 
 This is a learning/portfolio project and intentionally still has gaps on the roadmap:
