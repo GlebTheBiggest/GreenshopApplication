@@ -6,6 +6,7 @@ services:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: greenshop_db
+      PGPORT: 5433
     ports:
-      - "5433:5432"
+      - "5433:5433"
     restart: always
