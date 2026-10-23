@@ -23,7 +23,6 @@
 		<lombok.version>1.18.32</lombok.version>
 		<junit.jupiter.version>5.10.0</junit.jupiter.version>
 		<hibernate.version>6.4.4.Final</hibernate.version>
-		<jbcrypt.version>0.4</jbcrypt.version>
 		<springdoc.version>2.1.0</springdoc.version>
 		<modelmapper-spring.version>2.4.4</modelmapper-spring.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -106,13 +105,6 @@
 			<artifactId>jjwt-jackson</artifactId>
 			<version>0.11.5</version>
 			<scope>runtime</scope>
-		</dependency>
-
-		<!-- BCrypt -->
-		<dependency>
-			<groupId>org.mindrot</groupId>
-			<artifactId>jbcrypt</artifactId>
-			<version>${jbcrypt.version}</version>
 		</dependency>
 
 		<!-- SpringDoc OpenAPI -->
