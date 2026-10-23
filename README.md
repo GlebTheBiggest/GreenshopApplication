@@ -63,14 +63,15 @@ src/main/java/.../
 ### Prerequisites
 
 - JDK 21
-- A PostgreSQL database (local instance or a managed one, e.g. Neon/RDS/etc.)
+- A PostgreSQL database — either a local instance, a managed one (Neon/RDS/etc.), or
+  the bundled `docker-compose.yml` (see below)
 - A Stripe account (test mode is fine) if you want payment creation to actually work;
   any placeholder value lets the app start, but payment calls will fail
 
 ### Environment variables
 
 Configuration is driven entirely by environment variables (see
-`src/main/resources/application.properties`). The project uses
+`src/main/resources/application.yml`). The project uses
 [`spring-dotenv`](https://github.com/paulschwarz/spring-dotenv), which loads a `.env`
 file **from the project root** (`./.env`) if present — not from `src/`. Create one there,
 or export the variables another way (shell, IDE run config, Docker env file, etc.):
@@ -85,12 +86,26 @@ or export the variables another way (shell, IDE run config, Docker env file, etc
 | `JWT_REFRESH_EXPIRATION` | `604800000` | Refresh token TTL, ms |
 | `STRIPE_API_KEY` | `sk_test_...` | Stripe secret key |
 | `STRIPE_PUBLIC_KEY` | `pk_test_...` | Stripe publishable key |
-| `DB_URL` | `jdbc:postgresql://localhost:5432/greenshop_db` | |
-| `DB_USERNAME` | `greenshop` | |
-| `DB_PASSWORD` | *(your password)* | |
+| `DB_URL` | `jdbc:postgresql://localhost:5433/greenshop_db` | port `5433` matches the bundled `docker-compose.yml` |
+| `DB_USERNAME` | `greenshop` | also used as `POSTGRES_USER` by `docker-compose.yml` |
+| `DB_PASSWORD` | *(your password)* | also used as `POSTGRES_PASSWORD` by `docker-compose.yml` |
 | `DB_DRIVER` | `org.postgresql.Driver` | |
 
 Never commit a real `.env` file — it's already covered by `.gitignore`.
+
+### Database via Docker Compose
+
+If you don't already have a local Postgres, `docker-compose.yml` spins one up using the
+same `DB_USERNAME`/`DB_PASSWORD` from your `.env` (Docker Compose loads `./.env`
+automatically):
+
+```bash
+docker compose up -d
+```
+
+This starts Postgres on host port `5433` (mapped to the container's `5432`), which is
+why the `DB_URL` example above uses `5433` instead of the Postgres default. Data is not
+persisted across `docker compose down -v`.
 
 ### Run
 
