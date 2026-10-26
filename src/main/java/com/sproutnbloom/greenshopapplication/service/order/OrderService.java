@@ -4,6 +4,7 @@ import com.sproutnbloom.greenshopapplication.dto.ImageDto;
 import com.sproutnbloom.greenshopapplication.dto.OrderDto;
 import com.sproutnbloom.greenshopapplication.dto.OrderItemDto;
 import com.sproutnbloom.greenshopapplication.enums.OrderStatus;
+import com.sproutnbloom.greenshopapplication.event.OrderCreatedEvent;
 import com.sproutnbloom.greenshopapplication.exceptions.InsufficientStockException;
 import com.sproutnbloom.greenshopapplication.exceptions.ResourceNotFoundException;
 import com.sproutnbloom.greenshopapplication.model.*;
@@ -14,6 +15,7 @@ import com.sproutnbloom.greenshopapplication.request.UpdateProductRequest;
 import com.sproutnbloom.greenshopapplication.service.cart.CartService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +33,9 @@ public class OrderService implements IOrderService {
     private final ProductRepository productRepository;
     private final CartService cartService;
     private final ModelMapper modelMapper;
+    private final KafkaTemplate<String, OrderCreatedEvent> kafkaTemplate;
 
+    private static final String ORDER_CREATED_TOPIC = "order-created";
 
     @Transactional
     @Override
@@ -44,6 +48,15 @@ public class OrderService implements IOrderService {
         Order savedOrder = orderRepository.save(order);
         orderRepository.flush();
         cartService.clearCart(cart.getId());
+
+        kafkaTemplate.send(ORDER_CREATED_TOPIC, new OrderCreatedEvent(
+                savedOrder.getOrderId(),
+                savedOrder.getUser().getEmail(),
+                savedOrder.getTotalAmount(),
+                orderItemList.size(),
+                savedOrder.getOrderDate()
+        ));
+
         return savedOrder;
     }
 
