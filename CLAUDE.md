@@ -30,24 +30,21 @@ GreenshopApplication — бекенд для інтернет-магазину (
 
 1. ~~README + очищення pom.xml~~ — ЗРОБЛЕНО
 2. ~~Docker (Dockerfile + docker-compose з PostgreSQL)~~ — ЗРОБЛЕНО
-3. Тестування та CI (JUnit 5, Testcontainers, GitHub Actions) — НАСТУПНИЙ КРОК
-4. Redis (кешування каталогу товарів)
+3. ~~Тестування та CI (JUnit 5, Testcontainers, GitHub Actions)~~ — ЗРОБЛЕНО
+4. Redis (кешування каталогу товарів) — НАСТУПНИЙ КРОК
 5. Kafka (подія "order created" + обробка другим компонентом)
 6. Деплой в Azure (App Service або контейнер, керована PostgreSQL)
 7. React (базовий фронт)
 
 ## Відомі проблеми
 
-Авторизаційні проблеми з аудиту 23.10.2026 виправлені 26.10.2026 на гілці
-`fix/authorization-idor` (IDOR, порядок правил у `SecurityConfig`, глобальний
-exception handler, 401 замість 500 при неправильному паролі) — деталі в
-`DEVELOPMENT_PLAN.md`.
+Авторизаційні та автентифікаційні проблеми з аудиту 23.10.2026, а також усе знайдене
+під час Етапу 1 (`LazyInitializationException`, невірний рядок permission у
+`SecurityConfig`) і Етапу 2 (дублікат email → 500 замість 409, JWT без `jti` →
+колізії токенів) виправлені 26.10.2026 на гілці `fix/authorization-idor` і покриті
+regression-тестами. Деталі — в `DEVELOPMENT_PLAN.md`.
 
-Залишається актуальне, знайдене під час перевірки фіксу:
-
-- `GET /user/carts/my-cart` кидає `LazyInitializationException` на `cart.getItems()`
-  (лінива колекція читається поза транзакцією). Існувала і до фіксу IDOR, просто
-  не траплялась живим тестом раніше. Виправити в Етапі 2 разом з тестами.
+Відомих невиправлених проблем наразі немає.
 
 ## Як зі мною працювати
 

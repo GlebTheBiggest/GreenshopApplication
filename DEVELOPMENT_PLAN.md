@@ -29,21 +29,29 @@
 - [x] (бонус, знайдено під час фіксу) Піднято `springdoc-openapi` 2.1.0 → 2.8.17 —
       стара версія ламала `/v3/api-docs` щойно з'явився власний `@ControllerAdvice`
 
-**Нове, знайдене під час live-тестування, не входить в Етап 1:**
+- [x] `GET /user/carts/my-cart` та `GET /management/carts/{id}/cart` кидали
+      `LazyInitializationException` на `cart.getItems()` (open-in-view=false,
+      жоден з методів не був `@Transactional`). Виправлено через `JOIN FETCH`
+      у `CartRepository.findByUserId`/`findByIdWithItems`.
+- [x] (знайдено під час реордеру правил) `SecurityConfig` порівнював
+      `Permission.XXX.name()` ("ADMIN_READ") замість `.getPermission()`
+      ("admin:read") — гранулярні перевірки НІКОЛИ не могли спрацювати, навіть
+      після виправлення порядку правил. Виправлено на `.getPermission()`.
 
-- [ ] `GET /user/carts/my-cart` кидає `LazyInitializationException` на
-      `cart.getItems()` — колекція лінива, а сесія Hibernate вже закрита поза
-      транзакцією. Бага існувала й до цього фіксу (той самий код раніше просто не
-      мав тесту, що дістався до цього рядка). Потребує `@Transactional(readOnly = true)`
-      на сервісному методі або явного DTO-мапінгу всередині транзакції.
+## Етап 2 — Тестування та CI (ЗРОБЛЕНО, гілка `fix/authorization-idor`)
 
-## Етап 2 — Тестування та CI
-
-- [ ] Unit-тести на сервісний шар (JUnit 5 + Mockito)
-- [ ] Інтеграційні тести з Testcontainers (реальний PostgreSQL у контейнері)
-- [ ] Regression-тести на фікси з Етапу 1 (IDOR, 401 при логіні, порядок authz-правил)
-- [ ] Тест/фікс на `LazyInitializationException` у `GET /user/carts/my-cart`
-- [ ] GitHub Actions workflow: build + test на push/PR
+- [x] Testcontainers (реальний PostgreSQL у контейнері) — `AbstractIntegrationTest`,
+      singleton-container паттерн (щоб контейнер не гасився між тестовими класами)
+- [x] Unit-тести на сервісний шар (JUnit 5 + Mockito): `CartServiceTest`, `AuthServiceTest`
+- [x] Regression-тести на фікси з Етапу 1: `AuthenticationIntegrationTest`,
+      `CartOwnershipIntegrationTest`, `ManagementAuthorizationIntegrationTest`
+- [x] GitHub Actions workflow (`.github/workflows/ci.yml`): `mvn verify` на push/PR до master
+- [x] (знайдено під час написання тестів, виправлено) `/auth/register` повертав 500
+      замість 409 на дублікат email — `AuthService.register()` не перевіряв
+      `existsByEmail` перед вставкою
+- [x] (знайдено під час написання тестів, виправлено) JWT не мав `jti` — два токени
+      для одного юзера в межах однієї секунди (register одразу після authenticate)
+      були побайтово ідентичні й падали на UNIQUE-constraint колонки `token` → 500
 
 ## Етап 3 — Redis
 
