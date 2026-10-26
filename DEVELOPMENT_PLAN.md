@@ -11,24 +11,38 @@
 - [x] docker-compose (застосунок + PostgreSQL)
 - [x] Перевірка на закомічені секрети — не знайдено, `.env` в .gitignore
 
-## Етап 1 — Виправлення авторизації (наступний крок, перед або разом із тестами)
+## Етап 1 — Виправлення авторизації (ЗРОБЛЕНО, гілка `fix/authorization-idor`)
 
-Знайдено аудитом 23.10.2026, досі актуально. Кожен пункт — окрема гілка/коміт(и),
-бо торкається кількох контролерів.
+Знайдено аудитом 23.10.2026, виправлено 26.10.2026 і перевірено живими запитами
+(докладний звіт — у розмові з Claude).
 
-- [ ] Виправити IDOR: `UserCartController`, `UserCartItemController`, `UserOrderController`
-      мають брати `userId` з автентифікованого principal (JWT), а не з path/query/body
-- [ ] Виправити порядок правил у `SecurityConfig.securityFilterChain` — специфічні
-      матчери по HTTP-методу мають йти ПЕРЕД загальним `hasAnyRole` матчером
-- [ ] Додати глобальний `@ControllerAdvice`/`@ExceptionHandler` замість розрізнених try/catch
-- [ ] Виправити `AuthService.authenticate()` — неправильний пароль повинен повертати 401,
-      а не необроблений 500
+- [x] Виправити IDOR: `UserCartController`, `UserCartItemController`, `UserOrderController`
+      тепер беруть `userId` з автентифікованого principal (JWT), а не з path/query/body;
+      для ендпоінтів, де потрібен `cartId` (total-price, remove/update item), додано
+      явну перевірку власності кошика
+- [x] Виправити порядок правил у `SecurityConfig.securityFilterChain` — матчери по
+      HTTP-методу тепер йдуть ПЕРЕД загальним `hasAnyRole` матчером
+- [x] Додати глобальний `GlobalExceptionHandler` (`@RestControllerAdvice`) замість
+      розрізнених try/catch
+- [x] Побічний ефект глобального handler-а: `AuthService.authenticate()` з неправильним
+      паролем тепер повертає 401, а не необроблений 500 (live-tested)
+- [x] (бонус, знайдено під час фіксу) Піднято `springdoc-openapi` 2.1.0 → 2.8.17 —
+      стара версія ламала `/v3/api-docs` щойно з'явився власний `@ControllerAdvice`
+
+**Нове, знайдене під час live-тестування, не входить в Етап 1:**
+
+- [ ] `GET /user/carts/my-cart` кидає `LazyInitializationException` на
+      `cart.getItems()` — колекція лінива, а сесія Hibernate вже закрита поза
+      транзакцією. Бага існувала й до цього фіксу (той самий код раніше просто не
+      мав тесту, що дістався до цього рядка). Потребує `@Transactional(readOnly = true)`
+      на сервісному методі або явного DTO-мапінгу всередині транзакції.
 
 ## Етап 2 — Тестування та CI
 
 - [ ] Unit-тести на сервісний шар (JUnit 5 + Mockito)
 - [ ] Інтеграційні тести з Testcontainers (реальний PostgreSQL у контейнері)
-- [ ] Тести на знайдені в Етапі 1 проблеми (IDOR regression-тести — переконатись, що фікс працює)
+- [ ] Regression-тести на фікси з Етапу 1 (IDOR, 401 при логіні, порядок authz-правил)
+- [ ] Тест/фікс на `LazyInitializationException` у `GET /user/carts/my-cart`
 - [ ] GitHub Actions workflow: build + test на push/PR
 
 ## Етап 3 — Redis

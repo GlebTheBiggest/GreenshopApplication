@@ -36,28 +36,18 @@ GreenshopApplication — бекенд для інтернет-магазину (
 6. Деплой в Azure (App Service або контейнер, керована PostgreSQL)
 7. React (базовий фронт)
 
-## Відомі проблеми, які потрібно виправити
+## Відомі проблеми
 
-Перевірено аудитом 23.10.2026. Пункти з pom.xml (Spring Security BOM, бета-Stripe,
-jbcrypt) вже виправлені — Boot сам керує версіями Security/Hibernate. Секрети в git
-не знайдено, `.env` лежить у корені (правильне місце для spring-dotenv) і в .gitignore.
+Авторизаційні проблеми з аудиту 23.10.2026 виправлені 26.10.2026 на гілці
+`fix/authorization-idor` (IDOR, порядок правил у `SecurityConfig`, глобальний
+exception handler, 401 замість 500 при неправильному паролі) — деталі в
+`DEVELOPMENT_PLAN.md`.
 
-Залишились реальні проблеми в коді (не випадкові рефактори — кожна має йти окремою
-гілкою/кроком, бо торкається authorization-логіки в кількох контролерах):
+Залишається актуальне, знайдене під час перевірки фіксу:
 
-- **IDOR (OWASP API #1)**: `UserCartController.getCart`, `UserCartItemController.addItemToCart`,
-  `UserOrderController.createOrderWithPayment` беруть `userId` з path/query/body і не
-  перевіряють, що це поточний автентифікований користувач. Будь-який юзер може читати/писати
-  чужий кошик або оформити замовлення "від імені" іншого.
-- **Мертве правило авторизації** в `SecurityConfig` (`securityFilterChain`): загальний
-  матчер `requestMatchers("/api/v1/management/**").hasAnyRole(...)` стоїть ПЕРЕД
-  матчерами по HTTP-методах, тому granular `Permission` (ADMIN_READ, MANAGER_CREATE, ...)
-  фактично ніколи не перевіряється — спрацьовує лише роль.
-- Немає глобального `@ControllerAdvice` — кожен контролер по-своєму (і неоднаково)
-  обробляє винятки.
-- `AuthService.authenticate()` викликає `authenticationManager.authenticate()` напряму
-  в `@Service`, поза security filter chain — неправильний пароль при логіні падає як
-  необроблений 500, а не 401.
+- `GET /user/carts/my-cart` кидає `LazyInitializationException` на `cart.getItems()`
+  (лінива колекція читається поза транзакцією). Існувала і до фіксу IDOR, просто
+  не траплялась живим тестом раніше. Виправити в Етапі 2 разом з тестами.
 
 ## Як зі мною працювати
 
