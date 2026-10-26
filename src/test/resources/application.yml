@@ -8,6 +8,10 @@ spring:
     password: test
     driver-class-name: org.postgresql.Driver
 
+  mail:
+    host: localhost
+    port: 1025
+
   jpa:
     hibernate:
       ddl-auto: create-drop
