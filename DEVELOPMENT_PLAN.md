@@ -92,11 +92,26 @@
       перевірки залишку це вже окрема проблема коректності, а не лише виняток. Виправлено:
       перевірка залишку йде напряму через `ProductRepository`, повз кеш.
 
-## Етап 4 — Kafka
+## Етап 4 — Kafka (ЗРОБЛЕНО, гілка `fix/authorization-idor`)
 
-- [ ] Підняти Kafka (+ Zookeeper або KRaft) у docker-compose
-- [ ] Подія "order created" при оформленні замовлення
-- [ ] Другий компонент-слухач, що обробляє цю подію (наприклад, лист підтвердження або лог)
+- [x] Kafka у docker-compose в **KRaft-режимі** (без Zookeeper — сучасний, рекомендований
+      Apache спосіб для одного локального брокера) + **MailHog** (fake SMTP, веб-інтерфейс
+      на `:8025`)
+- [x] `OrderCreatedEvent` (orderId, userEmail, totalAmount, itemCount, orderDate) публікується
+      через `KafkaTemplate` у `OrderService.placeOrder` одразу після збереження замовлення
+- [x] Другий компонент — `OrderCreatedListener` (`@KafkaListener`, окрема consumer group
+      `greenshop-order-notifications`) — реально надсилає лист-підтвердження через
+      `EmailService`/`JavaMailSender` (`spring-boot-starter-mail` нарешті використано,
+      раніше лежав невикористаним ще з першого коміту) на MailHog
+- [x] Перевірено живими запитами: `POST /user/orders/create-with-payment` → в логах з'являється
+      `Received order-created event for order N` → у MailHog (`GET /api/v2/messages`) реально
+      з'являється лист із правильним темою/текстом/отримувачем/відправником
+- [x] Тестовий конфіг (`src/test/resources/application.yml`) потребував `spring.mail.host/port` —
+      без цього Boot не створює бін `JavaMailSender`, і весь `@SpringBootTest`-контекст падав
+- [x] Відома, свідомо не вирішена межа: публікація в Kafka — не частина транзакції БД
+      (dual-write problem). Якщо Kafka недосяжний у момент `placeOrder`, замовлення все одно
+      створиться, але подія загубиться. Повне рішення (transactional outbox) — поза обсягом
+      цього етапу.
 
 ## Етап 5 — Деплой в Azure
 
