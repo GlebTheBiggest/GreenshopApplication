@@ -23,7 +23,7 @@ public class CartService implements ICartService {
 
     @Override
     public Cart getCart(Long id) {
-        Cart cart = cartRepository.findById(id)
+        Cart cart = cartRepository.findByIdWithItems(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
         BigDecimal totalAmount = cart.getTotalAmount();
         cart.setTotalAmount(totalAmount);
@@ -65,6 +65,6 @@ public class CartService implements ICartService {
 
     @Override
     public Cart getCartByUserId(Long userId) {
-        return cartRepository.findByUserId(userId);
+        return cartRepository.findByUserId(userId).orElse(null);
     }
 }

@@ -4,6 +4,7 @@ import com.sproutnbloom.greenshopapplication.dto.ImageDto;
 import com.sproutnbloom.greenshopapplication.dto.OrderDto;
 import com.sproutnbloom.greenshopapplication.dto.OrderItemDto;
 import com.sproutnbloom.greenshopapplication.enums.OrderStatus;
+import com.sproutnbloom.greenshopapplication.event.OrderCreatedEvent;
 import com.sproutnbloom.greenshopapplication.exceptions.InsufficientStockException;
 import com.sproutnbloom.greenshopapplication.exceptions.ResourceNotFoundException;
 import com.sproutnbloom.greenshopapplication.model.*;
@@ -12,9 +13,9 @@ import com.sproutnbloom.greenshopapplication.repository.ProductRepository;
 import com.sproutnbloom.greenshopapplication.request.UpdateOrderStatusRequest;
 import com.sproutnbloom.greenshopapplication.request.UpdateProductRequest;
 import com.sproutnbloom.greenshopapplication.service.cart.CartService;
-import com.sproutnbloom.greenshopapplication.service.product.IProductService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,9 +32,10 @@ public class OrderService implements IOrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final CartService cartService;
-    private final IProductService productService;
     private final ModelMapper modelMapper;
+    private final KafkaTemplate<String, OrderCreatedEvent> kafkaTemplate;
 
+    private static final String ORDER_CREATED_TOPIC = "order-created";
 
     @Transactional
     @Override
@@ -46,6 +48,15 @@ public class OrderService implements IOrderService {
         Order savedOrder = orderRepository.save(order);
         orderRepository.flush();
         cartService.clearCart(cart.getId());
+
+        kafkaTemplate.send(ORDER_CREATED_TOPIC, new OrderCreatedEvent(
+                savedOrder.getOrderId(),
+                savedOrder.getUser().getEmail(),
+                savedOrder.getTotalAmount(),
+                orderItemList.size(),
+                savedOrder.getOrderDate()
+        ));
+
         return savedOrder;
     }
 
@@ -59,7 +70,11 @@ public class OrderService implements IOrderService {
 
     private List<OrderItem> createOrderItems(Order order, Cart cart) {
         return cart.getItems().stream().map(cartItem -> {
-            Product product = productService.getProductById(cartItem.getProduct().getId()); // Отримати актуальний продукт
+            // Беремо товар напряму з репозиторію, а не через закешований ProductService.getProductById:
+            // перевірка/списання залишку має працювати з гарантовано свіжими даними, а не тими,
+            // що могли закешуватись до 10 хвилин тому.
+            Product product = productRepository.findByIdWithImages(cartItem.getProduct().getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Product not found!"));
 
             // Перевірити наявність товару
             if (product.getStock() < cartItem.getQuantity()) {
