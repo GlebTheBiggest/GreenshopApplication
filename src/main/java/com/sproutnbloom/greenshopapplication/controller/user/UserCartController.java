@@ -6,15 +6,17 @@ import com.sproutnbloom.greenshopapplication.dto.ProductDto;
 import com.sproutnbloom.greenshopapplication.exceptions.ResourceNotFoundException;
 import com.sproutnbloom.greenshopapplication.model.Cart;
 import com.sproutnbloom.greenshopapplication.model.CartItem;
+import com.sproutnbloom.greenshopapplication.model.User;
 import com.sproutnbloom.greenshopapplication.response.ApiResponse;
 import com.sproutnbloom.greenshopapplication.service.cart.ICartService;
 import com.sproutnbloom.greenshopapplication.service.product.IProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -27,10 +29,10 @@ public class UserCartController {
     private final ICartService cartService;
     private final IProductService productService;
 
-    @GetMapping("/{userId}/my-cart")
-    public ResponseEntity<ApiResponse> getCart(@PathVariable Long userId) {
+    @GetMapping("/my-cart")
+    public ResponseEntity<ApiResponse> getCart(@AuthenticationPrincipal User currentUser) {
         try {
-            Cart cart = cartService.getCartByUserId(userId);
+            Cart cart = cartService.getCartByUserId(currentUser.getId());
             CartDto dto = new CartDto();
             dto.setCartId(cart.getId());
             dto.setTotalAmount(cart.getTotalAmount());
@@ -43,10 +45,13 @@ public class UserCartController {
     }
 
     @GetMapping("/{cartId}/cart/total-price")
-    public ResponseEntity<ApiResponse> getTotalAmount(@PathVariable Long cartId) {
+    public ResponseEntity<ApiResponse> getTotalAmount(@PathVariable Long cartId, @AuthenticationPrincipal User currentUser) {
         try {
-            BigDecimal totalPrice = cartService.getTotalPrice(cartId);
-            return ResponseEntity.ok(new ApiResponse("Total Price", totalPrice));
+            Cart cart = cartService.getCart(cartId);
+            if (cart.getUser() == null || !cart.getUser().getId().equals(currentUser.getId())) {
+                throw new AccessDeniedException("You do not have access to this cart");
+            }
+            return ResponseEntity.ok(new ApiResponse("Total Price", cart.getTotalAmount()));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
