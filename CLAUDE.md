@@ -31,8 +31,8 @@ GreenshopApplication — бекенд для інтернет-магазину (
 1. ~~README + очищення pom.xml~~ — ЗРОБЛЕНО
 2. ~~Docker (Dockerfile + docker-compose з PostgreSQL)~~ — ЗРОБЛЕНО
 3. ~~Тестування та CI (JUnit 5, Testcontainers, GitHub Actions)~~ — ЗРОБЛЕНО
-4. Redis (кешування каталогу товарів) — НАСТУПНИЙ КРОК
-5. Kafka (подія "order created" + обробка другим компонентом)
+4. ~~Redis (кешування каталогу товарів)~~ — ЗРОБЛЕНО
+5. Kafka (подія "order created" + обробка другим компонентом) — НАСТУПНИЙ КРОК
 6. Деплой в Azure (App Service або контейнер, керована PostgreSQL)
 7. React (базовий фронт)
 

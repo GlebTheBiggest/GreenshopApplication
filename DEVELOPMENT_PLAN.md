@@ -53,11 +53,24 @@
       для одного юзера в межах однієї секунди (register одразу після authenticate)
       були побайтово ідентичні й падали на UNIQUE-constraint колонки `token` → 500
 
-## Етап 3 — Redis
+## Етап 3 — Redis (ЗРОБЛЕНО, гілка `fix/authorization-idor`)
 
-- [ ] Підняти Redis у docker-compose
-- [ ] Кешування каталогу товарів (`@Cacheable`/`@CacheEvict` на продуктах/категоріях)
-- [ ] Перевірити інвалідацію кешу при зміні товару через management-ендпоінти
+- [x] Підняти Redis у docker-compose (`redis:7-alpine`, без пароля для локальної розробки)
+- [x] `CacheConfig` (`@EnableCaching` + `RedisCacheConfiguration`): TTL 10 хв, JSON-серіалізація
+      через `GenericJackson2JsonRedisSerializer`, null-значення не кешуються
+- [x] Кешування каталогу товарів: `@Cacheable` на всіх read-методах `ProductService`/
+      `CategoryService`, `@CacheEvict(allEntries = true)` на всіх write-методах
+- [x] (знайдено під час підготовки до кешування) `Image.product` не мав `@JsonIgnore` —
+      цикл `Product → images → Image → product → images → ...` впав би в
+      `StackOverflowError` щойно товар з картинкою потрапив би в кеш. Виправлено за
+      тим же принципом, що вже був у `Category.products`.
+- [x] Перевірено живими запитами через `docker exec greenshop_redis redis-cli`: перший
+      `GET /user/products/all` — похід у Postgres (~380мс) і запис `products::all` у
+      Redis; повторний — з кешу (~20мс); `POST /management/products/add` чистить
+      `products::all`, наступний `GET` перебудовує кеш вже з новим товаром.
+- [x] Перевірено, що відсутність Redis не ламає існуючі тести/CI (ліниве підключення
+      Lettuce) — жодних змін у `.github/workflows/ci.yml` не потрібно, поки тестів на
+      саме кешування немає.
 
 ## Етап 4 — Kafka
 
