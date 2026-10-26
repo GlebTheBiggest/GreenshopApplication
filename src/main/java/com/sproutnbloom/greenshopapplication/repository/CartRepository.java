@@ -9,9 +9,21 @@ import java.util.Optional;
 
 public interface CartRepository extends JpaRepository<Cart, Long> {
 
-    @Query("SELECT DISTINCT c FROM Cart c LEFT JOIN FETCH c.items WHERE c.user.id = :userId")
+    @Query("""
+        SELECT DISTINCT c FROM Cart c
+        LEFT JOIN FETCH c.items i
+        LEFT JOIN FETCH i.product p
+        LEFT JOIN FETCH p.images
+        WHERE c.user.id = :userId
+    """)
     Optional<Cart> findByUserId(@Param("userId") Long userId);
 
-    @Query("SELECT DISTINCT c FROM Cart c LEFT JOIN FETCH c.items WHERE c.id = :cartId")
+    @Query("""
+        SELECT DISTINCT c FROM Cart c
+        LEFT JOIN FETCH c.items i
+        LEFT JOIN FETCH i.product p
+        LEFT JOIN FETCH p.images
+        WHERE c.id = :cartId
+    """)
     Optional<Cart> findByIdWithItems(@Param("cartId") Long cartId);
 }
