@@ -7,9 +7,14 @@
 
 - [x] README (огляд проєкту, стек, запуск, API)
 - [x] Очищення pom.xml (видалено jbcrypt, Spring Security/Hibernate керує Boot, Stripe на стабільній версії)
-- [x] Dockerfile для застосунку
-- [x] docker-compose (застосунок + PostgreSQL)
+- [x] docker-compose (PostgreSQL, пізніше доповнено Redis/Kafka/MailHog — див. Етапи 3-4)
 - [x] Перевірка на закомічені секрети — не знайдено, `.env` в .gitignore
+
+**Виправлено 27.10.2026**: цей розділ помилково позначав "Dockerfile для застосунку" як
+зроблений. Dockerfile і `.dockerignore` справді були написані 24.10.2026, але на окремій
+гілці `feature/docker-app-image`, яка ніколи не була змержена ні в `master`, ні в
+`fix/authorization-idor` — у робочій гілці файлу не існувало. Переписано заново й
+перевірено в межах Етапу 5 (нижче).
 
 ## Етап 1 — Виправлення авторизації (ЗРОБЛЕНО, гілка `fix/authorization-idor`)
 
@@ -115,9 +120,26 @@
 
 ## Етап 5 — Деплой в Azure
 
-- [ ] Керована PostgreSQL в Azure
-- [ ] Деплой застосунку (App Service або контейнер/ACR)
-- [ ] Секрети через Azure-конфігурацію, не через .env у репо
+Обраний підхід: контейнер (Docker-образ через Azure Container Registry → App Service for
+Containers), не напряму `.jar` на App Service — проєкт і так уже активно працює з Docker
+(Redis/Kafka/MailHog в docker-compose), тож контейнеризація власного застосунку логічно
+продовжує ту саму навичку й дає досвід саме з образами/реєстрами, які реально
+використовують компанії.
+
+- [x] `Dockerfile` для застосунку (multi-stage: `eclipse-temurin:21-jdk-alpine` для збірки
+      через `./mvnw clean package -DskipTests`, потім `eclipse-temurin:21-jre-alpine` лише
+      з готовим `.jar` — щоб фінальний образ не тягнув компілятор) і `.dockerignore`
+      (виключає `.env`, `.git`, `target`, `*.md`). Перевірено: `docker build` проходить,
+      контейнер з цього образу реально стартує, підключається до Postgres/Redis/Kafka/
+      MailHog з `docker-compose.yml` і успішно обробляє `POST /auth/register` (200 + JWT).
+- [ ] Azure CLI встановлено локально, `az login` виконано
+- [ ] Azure resource group створено
+- [ ] Керована PostgreSQL в Azure (Azure Database for PostgreSQL — Flexible Server)
+- [ ] Azure Container Registry створено, образ застосунку залито туди
+- [ ] App Service for Containers створено, вказано на образ з ACR
+- [ ] Секрети (DB_URL/DB_USERNAME/DB_PASSWORD/JWT_SECRET_KEY/STRIPE keys тощо) прописано
+      через Azure App Service Configuration (Application Settings), не через `.env` у репо
+- [ ] Перевірено живими запитами на публічному Azure URL (реєстрація/логін/Swagger)
 
 ## Етап 6 — React (базовий фронт)
 
