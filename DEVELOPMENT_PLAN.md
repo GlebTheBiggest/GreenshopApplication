@@ -118,7 +118,7 @@
       створиться, але подія загубиться. Повне рішення (transactional outbox) — поза обсягом
       цього етапу.
 
-## Етап 5 — Деплой в Azure
+## Етап 5 — Деплой в Azure (ЗРОБЛЕНО 27.10.2026)
 
 Обраний підхід: контейнер (Docker-образ через Azure Container Registry → App Service for
 Containers), не напряму `.jar` на App Service — проєкт і так уже активно працює з Docker
@@ -132,14 +132,42 @@ Containers), не напряму `.jar` на App Service — проєкт і т�
       (виключає `.env`, `.git`, `target`, `*.md`). Перевірено: `docker build` проходить,
       контейнер з цього образу реально стартує, підключається до Postgres/Redis/Kafka/
       MailHog з `docker-compose.yml` і успішно обробляє `POST /auth/register` (200 + JWT).
-- [ ] Azure CLI встановлено локально, `az login` виконано
-- [ ] Azure resource group створено
-- [ ] Керована PostgreSQL в Azure (Azure Database for PostgreSQL — Flexible Server)
-- [ ] Azure Container Registry створено, образ застосунку залито туди
-- [ ] App Service for Containers створено, вказано на образ з ACR
-- [ ] Секрети (DB_URL/DB_USERNAME/DB_PASSWORD/JWT_SECRET_KEY/STRIPE keys тощо) прописано
-      через Azure App Service Configuration (Application Settings), не через `.env` у репо
-- [ ] Перевірено живими запитами на публічному Azure URL (реєстрація/логін/Swagger)
+- [x] Azure CLI встановлено локально, `az login` виконано (підписка "Azure subscription 1")
+- [x] Resource group `greenshop-rg` створено в регіоні `polandcentral`
+- [x] Керована PostgreSQL: Azure Database for PostgreSQL — Flexible Server `greenshop-pg`
+      (SKU `Standard_B1ms`, Burstable, 32 GB, PostgreSQL 15, регіон `polandcentral`), база
+      `greenshop_db`, файрвол дозволяє "усі Azure-сервіси" (`0.0.0.0` sentinel) + окреме
+      правило для домашньої IP для прямої перевірки через `psql`.
+- [x] Azure Container Registry `greenshopacr26` (Basic). `az acr build` (хмарна збірка)
+      виявилась заблокована Azure для нових підписок (захист від зловживань безкоштовною
+      обчислювальною потужністю для "ACR Tasks") — обійдено: образ зібрано локально
+      (`docker build`) і відправлено (`docker push`) напряму в реєстр.
+- [x] App Service Plan `greenshop-plan` (Linux, B1) — квота `B1` в `polandcentral` і
+      `westeurope` виявилась 0 для нової підписки (типове обмеження перших днів підписки);
+      спрацював регіон `swedencentral`. Web App `greenshop-backend` створено з образу
+      `greenshopacr26.azurecr.io/greenshop-app:v1`; автентифікація до ACR — через
+      **Managed Identity** застосунку + роль `AcrPull`, без пароля реєстру. `WEBSITES_PORT=8080`
+      виставлено явно (контейнер слухає 8080, Linux App Service за замовчуванням чекає 80).
+- [x] Секрети через Azure App Service Configuration (Application Settings), не `.env`:
+      `DB_URL/DB_USERNAME/DB_PASSWORD` → на `greenshop-pg`; `JWT_SECRET_KEY` —
+      **новий, окремий від локального** секрет (кожне середовище має власний); `STRIPE_*`
+      (тестові ключі), `SERVER_PORT`, `API_PREFIX` — ті самі значення, що й локально.
+      `REDIS_HOST`/`KAFKA_BOOTSTRAP_SERVERS`/`MAIL_HOST` — поставлено заглушки (`localhost`),
+      бо Redis/Kafka/SMTP у хмарі ще не підняті (окремі платні Azure-сервіси, поза обсягом
+      цього етапу) — застосунок стартує нормально (Lettuce/Kafka-клієнт лаються в фоні, не
+      валять старт, перевірено ще в Етапі 3-4), просто кешування завжди "промахується", а
+      Kafka-подія/лист при замовленні не надсилаються (той самий dual-write-пробіл, тепер і
+      в хмарі).
+- [x] Перевірено живими запитами на `https://greenshop-backend.azurewebsites.net`:
+      `POST /auth/register` (200 + JWT), `POST /auth/authenticate` (200 + JWT), дані реально
+      лежать у `greenshop-pg` (перевірено прямим `psql`-запитом), Swagger UI та
+      `/v3/api-docs` віддають 200.
+
+**Нагадування про вартість**: `greenshop-pg` (Burstable B1ms) і `greenshop-plan` (Basic B1) —
+обидва платні, що тікають постійно, доки запущені. Щоб не платити між демонстраціями:
+`az postgres flexible-server stop --resource-group greenshop-rg --name greenshop-pg` (і
+`...start` назад), або просто `az group delete --name greenshop-rg` щоб прибрати геть усе
+одною командою й перестворити пізніше з нуля.
 
 ## Етап 6 — React (базовий фронт)
 
