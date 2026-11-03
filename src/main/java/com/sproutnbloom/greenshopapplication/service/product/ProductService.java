@@ -13,6 +13,9 @@ import com.sproutnbloom.greenshopapplication.request.AddProductRequest;
 import com.sproutnbloom.greenshopapplication.request.UpdateProductRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,6 +31,10 @@ public class ProductService implements IProductService {
     private final ModelMapper modelMapper;
     private final ImageRepository imageRepository;
 
+    @Caching(evict = {
+            @CacheEvict(value = "products", allEntries = true),
+            @CacheEvict(value = "categories", allEntries = true)
+    })
     @Override
     public Product addProduct(AddProductRequest request) {
         Category category = Optional.ofNullable(categoryRepository.findByName(request.getCategory().getName()))
@@ -50,12 +57,14 @@ public class ProductService implements IProductService {
         );
     }
 
+    @Cacheable(value = "products", key = "#id")
     @Override
     public Product getProductById(Long id) {
         return productRepository.findByIdWithImages(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found!"));
     }
 
+    @CacheEvict(value = "products", allEntries = true)
     @Override
     public void deleteProductById(Long id) {
         productRepository.findById(id)
@@ -65,6 +74,7 @@ public class ProductService implements IProductService {
                         });
     }
 
+    @CacheEvict(value = "products", allEntries = true)
     @Override
     public Product updateProduct(UpdateProductRequest request, Long productId) {
         return productRepository.findById(productId)
@@ -85,31 +95,37 @@ public class ProductService implements IProductService {
         return existingProduct;
     }
 
+    @Cacheable(value = "products", key = "'all'")
     @Override
     public List<Product> getAllProducts() {
         return productRepository.findAllWithImages();
     }
 
+    @Cacheable(value = "products", key = "'category:' + #category")
     @Override
     public List<Product> getProductsByCategory(String category) {
         return productRepository.findByCategoryNameWithImages(category);
     }
 
+    @Cacheable(value = "products", key = "'brand:' + #brand")
     @Override
     public List<Product> getProductsByBrand(String brand) {
         return productRepository.findByBrandWithImages(brand);
     }
 
+    @Cacheable(value = "products", key = "'category:' + #category + ':brand:' + #brand")
     @Override
     public List<Product> getProductsByCategoryAndBrand(String category, String brand) {
         return productRepository.findByCategoryNameAndBrandWithImages(category, brand);
     }
 
+    @Cacheable(value = "products", key = "'name:' + #name")
     @Override
     public List<Product> getProductsByName(String name) {
         return productRepository.findByNameWithImages(name);
     }
 
+    @Cacheable(value = "products", key = "'brand:' + #brand + ':name:' + #name")
     @Override
     public List<Product> getProductsByBrandAndName(String brand, String name) {
         return productRepository.findByBrandAndNameWithImages(brand, name);

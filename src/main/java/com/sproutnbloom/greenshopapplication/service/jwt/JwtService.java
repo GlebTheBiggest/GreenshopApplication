@@ -13,6 +13,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Service
@@ -67,6 +68,7 @@ public class JwtService implements IJwtService {
 
         return Jwts.builder()
                 .setClaims(extraClaims)
+                .setId(UUID.randomUUID().toString())
                 .setSubject(subject)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)

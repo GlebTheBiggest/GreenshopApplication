@@ -3,6 +3,7 @@ package com.sproutnbloom.greenshopapplication.service.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sproutnbloom.greenshopapplication.enums.Role;
 import com.sproutnbloom.greenshopapplication.enums.TokenType;
+import com.sproutnbloom.greenshopapplication.exceptions.AlreadyExistsException;
 import com.sproutnbloom.greenshopapplication.model.Token;
 import com.sproutnbloom.greenshopapplication.model.User;
 import com.sproutnbloom.greenshopapplication.repository.TokenRepository;
@@ -35,6 +36,9 @@ public class AuthService implements IAuthService {
 
     @Override
     public AuthResponse register(RegisterRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new AlreadyExistsException(request.getEmail() + " already exists");
+        }
         var user = User.builder()
                 .firstname(request.getFirstname())
                 .lastname(request.getLastname())

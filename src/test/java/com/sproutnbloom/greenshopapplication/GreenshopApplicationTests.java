@@ -1,10 +1,8 @@
 package com.sproutnbloom.greenshopapplication;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class GreenshopApplicationTests {
+class GreenshopApplicationTests extends AbstractIntegrationTest {
 
 	@Test
 	void contextLoads() {

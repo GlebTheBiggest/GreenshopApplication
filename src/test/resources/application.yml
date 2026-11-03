@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: GreenshopApplicationTest
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/test
+    username: test
+    password: test
+    driver-class-name: org.postgresql.Driver
+
+  mail:
+    host: localhost
+    port: 1025
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        connection:
+          autocommit: false
+
+server:
+  port: 0
+
+application:
+  security:
+    jwt:
+      secret-key: test-jwt-secret-key-for-junit-tests-only-do-not-use-in-production
+      expiration: 3600000
+      refresh-token:
+        expiration: 604800000
+
+stripe:
+  api:
+    key: sk_test_dummy
+  public:
+    key: pk_test_dummy
+
+api:
+  prefix: /api/v1
